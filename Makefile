@@ -1,5 +1,5 @@
-NAME = program
-HNAME = haskell
+NAME = programC
+HNAME = programH
 LIBS = -lm -lgsl -lgslcblas -lMinuit2 -L/usr/lib/root -L/usr/lib/root/5.18 -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lz -ldl
 CFLAGS = $$(root-config --cflags)
 CXX = g++ -Wall -O2
