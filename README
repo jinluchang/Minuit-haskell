@@ -1,0 +1,12 @@
+This is a Haskell binding for Minuit2 C++ library which is part of the
+ROOT system.
+
+It should be noted that this binding only provide limited access of
+Minuit2 library, thus it perhaps is not suitable for productive use.
+
+The binding mainly contains two component:
+
+1. C binding to Minuit2. (minuit-c.h, minuit-c.cc)
+
+2. Haskell binding build on top of the C binding. (Minuit.hs)
+
