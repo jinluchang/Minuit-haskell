@@ -1,35 +1,41 @@
-NAME = programC
-HNAME = programH
-LIBS = -lm -lMinuit2 -ldl -L/usr/lib/root -L/usr/lib/root/5.18
-CFLAGS = -I/usr/include/root
-CXX = g++ -Wall -O2
-CC = gcc -Wall -O2
-HC = ghc -Wall -O2
-OBJECTS = minuit-c.o
-HEADERS = minuit-c.h
-HASKELLS = Main.hs Minuit.hs
+name = program
+cname = cprogram
 
-all : $(NAME) $(HNAME)
+hc = ghc -Wall -O2
+main = Main.hs
+source = *.hs
 
-hrun : $(HNAME)
-	LD_LIBRARY_PATH=/usr/lib/root/5.18 ./$(HNAME)
+cxx = g++ -Wall -O2
+cc = gcc -Wall -O2
+headers = minuit-c.h
+objects = minuit-c.o
 
-run : $(NAME)
-	LD_LIBRARY_PATH=/usr/lib/root/5.18 ./$(NAME)
+clean = $(name) $(cname) *.hi *.o *_stub.*
+
+cflags = -I/usr/include/root
+libs = -lm -lMinuit2 -ldl -L/usr/lib/root -L/usr/lib/root/5.18
+
+all : $(name) $(cname)
+
+run : $(name)
+	LD_LIBRARY_PATH=/usr/lib/root/5.18 ./$(name)
+
+crun : $(cname)
+	LD_LIBRARY_PATH=/usr/lib/root/5.18 ./$(cname)
 
 clean :
-	rm $(NAME) $(HNAME) *.hi *.o *_stub.*
+	rm $(clean)
 
-$(HNAME) : $(HASKELLS) $(HEADERS) $(OBJECTS)
-	$(HC) --make -o $(HNAME) Main.hs $(OBJECTS) $(LIBS)
+$(name) : $(source) $(headers) $(objects)
+	$(hc) --make -o $(name) $(main) $(objects) $(libs)
 
-$(NAME) : main.o $(OBJECTS)
-	$(CXX) -o $@ main.o $(OBJECTS) $(LIBS)
+$(cname) : main.o $(objects)
+	$(cxx) -o $@ main.o $(objects) $(libs)
 
-%.o : %.cc $(HEADERS)
-	$(CXX) -c -o $@ $< $(CFLAGS)
+%.o : %.cc $(headers)
+	$(cxx) -c -o $@ $< $(cflags)
 
-%.o : %.c $(HEADERS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+%.o : %.c $(headers)
+	$(cc) -c -o $@ $< $(cflags)
 
 
