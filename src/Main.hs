@@ -1,7 +1,7 @@
 
 module Main where
 
-import Minuit
+import Math.Minuit
 
 funcTest :: Double -> FcnFunction
 funcTest par [x, y] = par + par * (sin x-0.4)**2 + 4*(y-4.2)**2

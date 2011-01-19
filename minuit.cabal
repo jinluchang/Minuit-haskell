@@ -1,0 +1,53 @@
+name: minuit
+version: 0.0.1
+license: GPL-3
+license-file: COPYING
+copyright: (c) Frank Waterret
+author: Frank Waterret
+maintainer: Frank Waterret <waterret@gmail.com>
+bug-reports: mailto:waterret@gmail.com
+stability: unstable
+homepage: http://waterret.oicp.net/unavailable
+synopsis: A haskell binding to Minuit2.
+category: Math
+cabal-version: >= 1.6
+build-type: Simple
+
+Description:
+  This is a Haskell binding for Minuit2 C++ library which is part of
+  the ROOT system. It should be noted that this binding only provide
+  limited access of Minuit2 library, thus it perhaps is not suitable
+  for productive use. Because the website of the program is still not
+  working as expected, if you have some problems, contact the author
+  directly through email instead.
+
+source-repository head
+  type:     git
+  location: http://waterret.oicp.net/unavailable
+
+flag threaded
+  default: False
+
+library
+  exposed-modules : Math.Minuit
+  build-depends: base >= 4.2 && < 5
+  hs-source-dirs: src
+  c-sources : src/minuit-c.cc
+  include-dirs : /usr/include/root
+  extra-libraries : m Minuit2 dl
+  extra-lib-dirs : /usr/lib/root /usr/lib/root/5.18
+  if flag(threaded)
+     ghc-options: -threaded
+
+executable test-minuit
+  hs-source-dirs: src
+  main-is: Main.hs
+  c-sources : src/minuit-c.cc
+  include-dirs : /usr/include/root
+  extra-libraries : m Minuit2 dl
+  extra-lib-dirs : /usr/lib/root /usr/lib/root/5.18
+  build-depends: base >= 4.2 && < 5,
+                 cmdargs >= 0.6.5
+  if flag(threaded)
+     ghc-options: -threaded
+

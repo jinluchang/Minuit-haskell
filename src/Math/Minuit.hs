@@ -1,6 +1,6 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 
-module Minuit where
+module Math.Minuit where
 
 import Control.Monad
 
