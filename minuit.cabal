@@ -29,17 +29,18 @@ flag threaded
   default: False
 
 library
-  exposed-modules : Math.Minuit
-  build-depends: base >= 4.2 && < 5
+  exposed-modules: Math.Minuit
   hs-source-dirs: src
-  c-sources : src/minuit-c.cc
-  include-dirs : /usr/include/root
-  extra-libraries : m Minuit2 dl
-  extra-lib-dirs : /usr/lib/root /usr/lib/root/5.18
+  c-sources: src/minuit-c.cc
+  include-dirs: /usr/include/root
+  extra-libraries: m Minuit2 dl
+  extra-lib-dirs: /usr/lib/root /usr/lib/root/5.18
+  build-depends: base >= 4.2 && < 5
+  ghc-options: -Wall
   if flag(threaded)
      ghc-options: -threaded
 
-executable test-minuit
+executable minuit-test
   hs-source-dirs: src
   main-is: Main.hs
   c-sources : src/minuit-c.cc
@@ -48,6 +49,7 @@ executable test-minuit
   extra-lib-dirs : /usr/lib/root /usr/lib/root/5.18
   build-depends: base >= 4.2 && < 5,
                  cmdargs >= 0.6.5
+  ghc-options: -Wall
   if flag(threaded)
      ghc-options: -threaded
 
