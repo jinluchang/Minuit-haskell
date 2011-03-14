@@ -36,7 +36,7 @@ library
   extra-libraries: m Minuit2 dl
   extra-lib-dirs: /usr/lib/root /usr/lib/root/5.18
   build-depends: base >= 4.2 && < 5
-  ghc-options: -Wall
+  ghc-options: -Wall -O2
   if flag(threaded)
      ghc-options: -threaded
 
@@ -49,7 +49,7 @@ executable minuit-test
   extra-lib-dirs : /usr/lib/root /usr/lib/root/5.18
   build-depends: base >= 4.2 && < 5,
                  cmdargs >= 0.6.5
-  ghc-options: -Wall
+  ghc-options: -Wall -O2
   if flag(threaded)
      ghc-options: -threaded
 
