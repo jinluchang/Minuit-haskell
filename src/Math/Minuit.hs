@@ -10,12 +10,13 @@ import Foreign.C.String
 
 type Minimum = (Bool, Double, [Double], [Double])
 type FcnFunction = [Double] -> Double
+type FcnFunctionIO = [Double] -> IO Double
 
-type CFcnFunction = CInt -> Ptr CDouble -> Ptr () -> CDouble
+type CFcnFunctionIO = CInt -> Ptr CDouble -> Ptr () -> IO CDouble
 
 foreign import ccall "minuit-c.h migrad"
-    c_migrad :: CInt
-        -> FunPtr CFcnFunction
+    c_migradIO :: CInt
+        -> FunPtr CFcnFunctionIO
         -> Ptr CString
         -> Ptr CDouble -> Ptr CDouble
         -> Ptr CDouble -> Ptr CDouble
@@ -24,20 +25,19 @@ foreign import ccall "minuit-c.h migrad"
         -> IO CInt
 
 foreign import ccall "wrapper"
-    mkFunPtr_CFcnFunction :: CFcnFunction
-        -> IO (FunPtr CFcnFunction)
+    mkFunPtr_CFcnFunctionIO :: CFcnFunctionIO
+        -> IO (FunPtr CFcnFunctionIO)
 
-cFcnFunction :: FcnFunction -> CFcnFunction
-cFcnFunction fcnFunc c_comp c_pVals _ = unsafePerformIO $ do
+cFcnFunctionIO :: FcnFunctionIO -> CFcnFunctionIO
+cFcnFunctionIO fcnFuncIO c_comp c_pVals _ = do
     let comp = fromIntegral c_comp
     c_vals <- peekArray comp c_pVals
     let vals = map realToFrac c_vals
-    return $ realToFrac $ fcnFunc vals
+    liftM realToFrac $ fcnFuncIO vals
 
-migrad :: FcnFunction -> [String] -> [Double] -> [Double] -> Minimum 
-migrad fcnFunc names initVals initErrs =
+migradIO :: FcnFunctionIO -> [String] -> [Double] -> [Double] -> IO Minimum
+migradIO fcnFuncIO names initVals initErrs =
     let comp = length names in
-    unsafePerformIO $
     alloca $ \ p_isValid ->
     alloca $ \ p_fcn ->
     allocaArray comp $ \ p_names ->
@@ -45,12 +45,12 @@ migrad fcnFunc names initVals initErrs =
     allocaArray comp $ \ p_initErrs ->
     allocaArray comp $ \ p_miniVals ->
     allocaArray comp $ \ p_miniErrs -> do
-        c_fcnFunc <- mkFunPtr_CFcnFunction $ cFcnFunction fcnFunc
+        c_fcnFuncIO <- mkFunPtr_CFcnFunctionIO $ cFcnFunctionIO fcnFuncIO
         c_names <- mapM newCString names
         pokeArray p_names c_names
         pokeArray p_initVals $ map realToFrac initVals
         pokeArray p_initErrs $ map realToFrac initErrs
-        _ <- c_migrad (fromIntegral comp) c_fcnFunc p_names
+        _ <- c_migradIO (fromIntegral comp) c_fcnFuncIO p_names
             p_initVals p_initErrs
             p_miniVals p_miniErrs
             p_fcn p_isValid nullPtr
@@ -61,8 +61,11 @@ migrad fcnFunc names initVals initErrs =
         miniVals <- liftM (map realToFrac) $ peekArray comp p_miniVals
         miniErrs <- liftM (map realToFrac) $ peekArray comp p_miniErrs
         mapM_ free c_names
-        freeHaskellFunPtr c_fcnFunc
+        freeHaskellFunPtr c_fcnFuncIO
         return (isValid, fcn, miniVals, miniErrs)
 
-
+migrad :: FcnFunction -> [String] -> [Double] -> [Double] -> Minimum
+migrad fcnFunc names initVals initErrs = unsafePerformIO $
+    migradIO funcFuncIO names initVals initErrs where
+    funcFuncIO vs = return $ fcnFunc vs
 

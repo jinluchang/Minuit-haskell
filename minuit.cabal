@@ -1,5 +1,5 @@
 name: minuit
-version: 0.0.1
+version: 0.0.2
 license: GPL-3
 license-file: COPYING
 copyright: (c) Frank Waterret
@@ -52,4 +52,3 @@ executable minuit-test
   ghc-options: -Wall -O2
   if flag(threaded)
      ghc-options: -threaded
-
