@@ -12,16 +12,16 @@ objects = minuit-c.o
 
 clean = $(name) $(cname) *.hi *.o *_stub.*
 
-cflags = -I/usr/include/root
-libs = -lm -lMinuit2 -ldl -L/usr/lib/root -L/usr/lib/root/5.18
+cflags =
+libs = -lm -lMinuit2 -lstdc++
 
 all : $(name) $(cname)
 
 run : $(name)
-	LD_LIBRARY_PATH=/usr/lib/root/5.18 ./$(name)
+	./$(name)
 
 crun : $(cname)
-	LD_LIBRARY_PATH=/usr/lib/root/5.18 ./$(cname)
+	./$(cname)
 
 clean :
 	rm $(clean)

@@ -3,6 +3,7 @@
 module Math.Minuit where
 
 import Control.Monad
+import System.IO.Unsafe
 
 import Foreign
 import Foreign.C.Types
