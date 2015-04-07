@@ -9,7 +9,9 @@ import Foreign
 import Foreign.C.Types
 import Foreign.C.String
 
-type Minimum = (Bool, Double, [Double], [Double])
+import Graphics.PlotWithGnu
+
+type Minimum = ((Bool, Double), ([Double], [Double]))
 type FcnFunction = [Double] -> Double
 type FcnFunctionIO = [Double] -> IO Double
 
@@ -63,10 +65,22 @@ migradIO fcnFuncIO names initVals initErrs =
         miniErrs <- liftM (map realToFrac) $ peekArray comp p_miniErrs
         mapM_ free c_names
         freeHaskellFunPtr c_fcnFuncIO
-        return (isValid, fcn, miniVals, miniErrs)
+        return ((isValid, fcn), (miniVals, miniErrs))
 
 migrad :: FcnFunction -> [String] -> [Double] -> [Double] -> Minimum
 migrad fcnFunc names initVals initErrs = unsafePerformIO $
-    migradIO funcFuncIO names initVals initErrs where
+    migradIO funcFuncIO names initVals initErrs
+  where
     funcFuncIO vs = return $ fcnFunc vs
+
+minimize :: FcnFunction -> [String] -> [Double] -> [Double] -> Minimum
+minimize = migrad
+
+makeFcnFunc :: ([Double] -> [Double] -> Double) -> Int -> DataTable -> FcnFunction
+makeFcnFunc fitf dims table = fcn where
+    poses = map (take dims) table
+    valerrs = map (drop dims) table
+    fcn params = sum $ zipWith sfcn valerrs $ map (fitf params) poses
+    sfcn [v,e] f = sqr $ (f-v)/e
+    sqr x = x*x
 
